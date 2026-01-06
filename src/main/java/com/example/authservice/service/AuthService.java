@@ -7,8 +7,6 @@ import com.example.authservice.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 @Service
 public class AuthService {
 
@@ -24,10 +22,15 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(String username, String email, String password) {
+    // ✅ METHOD NAME MATCHES CONTROLLER
+    public User register(String username, String email, String password) {
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already exists");
+        }
 
         Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
+                .orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
 
         User user = new User();
         user.setUsername(username);

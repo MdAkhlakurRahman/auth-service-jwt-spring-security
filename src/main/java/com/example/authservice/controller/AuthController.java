@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final AuthenticationManager authManager;
+    private final JwtUtil jwtUtil;
     private final AuthService authService;
 
     public AuthController(AuthenticationManager authManager,
@@ -20,33 +22,30 @@ public class AuthController {
         this.authService = authService;
     }
 
-    private final AuthenticationManager authManager;
-    private final JwtUtil jwtUtil;
-
-
+    // ---------------- LOGIN ----------------
     @PostMapping("/login")
     public String login(@RequestBody AuthRequest req) {
 
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        req.username, req.password
+                        req.username,
+                        req.password
                 )
         );
 
         return jwtUtil.generateToken(req.username);
     }
 
+    // ---------------- REGISTER ----------------
     @PostMapping("/register")
-    public String register() {
-        System.out.println("🔥 REGISTER ENDPOINT HIT");
+    public String register(@RequestBody RegisterRequest request) {
 
-        authService.registerUser(
-                "testuser",
-                "test@test.com",
-                "password"
+        authService.register(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword()
         );
-        return "User created";
+
+        return "User registered successfully";
     }
-
-
 }
